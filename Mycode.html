@@ -1,12 +1,99 @@
-- 👋 Hi, I’m @Prathikshaa30
-- 👀 I’m interested in ...
-- 🌱 I’m currently learning ...
-- 💞️ I’m looking to collaborate on ...
-- 📫 How to reach me ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        select {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Details</h1>
+    <label for="cityFilter">Filter by City:</label>
+    <select id="cityFilter" onchange="filterTable()">
+        <option value="">All Cities</option>
+    </select>
 
-<!---
-Prathikshaa30/Prathikshaa30 is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
-You can click the Preview link to take a look at your changes.
---->
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>City</th>
+            </tr>
+        </thead>
+        <tbody id="userTable">
+            <!-- User details will be populated here -->
+        </tbody>
+    </table>
+
+    <script>
+        const apiUrl = "https://jsonplaceholder.typicode.com/users";
+        let users = [];
+
+        // Fetch user data from API
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                users = data;
+                populateTable(users);
+                populateCityDropdown(users);
+            })
+            .catch(error => console.error("Error fetching user data:", error));
+
+        // Populate table with user data
+        function populateTable(users) {
+            const tableBody = document.getElementById("userTable");
+            tableBody.innerHTML = "";
+
+            users.forEach(user => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${user.name}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>${user.address.street}, ${user.address.suite}, ${user.address.zipcode}</td>
+                    <td>${user.address.city}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Populate city dropdown with unique city names
+        function populateCityDropdown(users) {
+            const cityFilter = document.getElementById("cityFilter");
+            const cities = [...new Set(users.map(user => user.address.city))];
+
+            cities.forEach(city => {
+                const option = document.createElement("option");
+                option.value = city;
+                option.textContent = city;
+                cityFilter.appendChild(option);
+            });
+        }
+
+        // Filter table by city
+        function filterTable() {
+            const selectedCity = document.getElementById("cityFilter").value;
+            const filteredUsers = selectedCity ? users.filter(user => user.address.city === selectedCity) : users;
+            populateTable(filteredUsers);
+        }
+    </script>
+</body>
+</html>
